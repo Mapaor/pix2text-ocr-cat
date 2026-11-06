@@ -44,6 +44,12 @@ button:disabled {
   padding: 1.5rem 0.5rem;
 }
 
+.app-content {
+  width: 100%;
+  max-width: 36rem;
+  margin: 2rem auto 0;
+}
+
 .field-label {
   display: block;
   margin-bottom: 0.5rem;
@@ -235,6 +241,35 @@ textarea {
   stroke-width: 2;
 }
 
+.source-footer {
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 0 0.5rem;
+}
+
+.source-footer h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+}
+
+.source-footer p {
+  margin: 0;
+  color: #4b5563;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.source-footer a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.source-footer .source-note {
+  margin-top: 0.375rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
 .processing-state {
   display: flex;
   flex-direction: column;
@@ -297,6 +332,14 @@ textarea::placeholder {
   .field-label,
   .drop-zone strong {
     color: #d1d5db;
+  }
+
+  .source-footer p {
+    color: #9ca3af;
+  }
+
+  .source-footer .source-note {
+    color: #6b7280;
   }
 
   .select,

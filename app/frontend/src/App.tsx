@@ -4,15 +4,15 @@ type Language = "en" | "es";
 type RecognitionType = "page" | "text_formula" | "formula" | "text";
 
 const recognitionOptions: Array<{ value: RecognitionType; label: string }> = [
-  { value: "page", label: "Page" },
-  { value: "text_formula", label: "Text and formulas" },
-  { value: "formula", label: "Formula" },
+  { value: "page", label: "Pàgina" },
+  { value: "text_formula", label: "Text i fórmules" },
+  { value: "formula", label: "Fórmula" },
   { value: "text", label: "Text" },
 ];
 
 function App() {
   const [selectedFile, setSelectedFile] = useState<File>();
-  const [language, setLanguage] = useState<Language>("en");
+  const [language, setLanguage] = useState<Language>("es");
   const [recognitionType, setRecognitionType] =
     useState<RecognitionType>("text_formula");
   const [markdown, setMarkdown] = useState("");
@@ -25,7 +25,7 @@ function App() {
 
   const setFile = (file: File | undefined) => {
     if (!file || !file.type.startsWith("image/")) {
-      setMessage("Please select an image.");
+      setMessage("Selecciona una imatge.");
       return;
     }
     setSelectedFile(file);
@@ -54,7 +54,7 @@ function App() {
 
   const convert = async (file = selectedFile) => {
     if (!file) {
-      setMessage("Paste or select an image first.");
+      setMessage("Enganxa o selecciona una imatge primer.");
       return;
     }
 
@@ -63,7 +63,7 @@ function App() {
     data.append("language", language);
     data.append("recognition_type", recognitionType);
     setIsConverting(true);
-    setMessage("Processing...");
+    setMessage("Processant...");
 
     try {
       const response = await fetch("/api/convert", {
@@ -71,11 +71,11 @@ function App() {
         body: data,
       });
       const body = (await response.json()) as { markdown?: string; detail?: string };
-      if (!response.ok) throw new Error(body.detail || "Conversion failed.");
+      if (!response.ok) throw new Error(body.detail || "La conversió ha fallat.");
       setMarkdown(body.markdown ?? "");
       setMessage("");
     } catch (reason) {
-      setMessage(reason instanceof Error ? reason.message : "Conversion failed.");
+      setMessage(reason instanceof Error ? reason.message : "La conversió ha fallat.");
     } finally {
       setIsConverting(false);
     }
@@ -87,18 +87,19 @@ function App() {
 
   return (
     <main className="app-shell">
-      <label className="field-label" htmlFor="language">Language</label>
+      <div className="app-content">
+      <label className="field-label" htmlFor="language">Idioma</label>
         <select
           id="language"
           className="select"
           value={language}
           onChange={(event) => setLanguage(event.target.value as Language)}
         >
-            <option value="en">English</option>
-            <option value="es">Spanish</option>
+            <option value="en">Anglès</option>
+            <option value="es">Castellà</option>
         </select>
 
-        <label className="field-label" htmlFor="recognition-type">Recognition type</label>
+        <label className="field-label" htmlFor="recognition-type">Tipus de reconeixement</label>
         <select
           id="recognition-type"
           className="select"
@@ -128,9 +129,9 @@ function App() {
         <svg className="upload-icon" aria-hidden="true" viewBox="0 0 24 24">
           <path d="M13 3v9.586l3.5-3.5 1.414 1.414L12 16.414 6.086 10.5 7.5 9.086l3.5 3.5V3H13ZM4.5 14v5h15v-5h2v7h-19v-7h2Z" />
         </svg>
-        <strong>Drop or paste an image, or click to select</strong>
-        <span className="drop-help">Supports drag and drop, Ctrl+V, and image files</span>
-        {previewUrl && <img className="preview" src={previewUrl} alt="Selected image preview" />}
+        <strong>Arrossega o enganxa una imatge, o clica per seleccionar-la</strong>
+        <span className="drop-help">(Admet arrossegar, Ctrl+V i fitxers d'imatge)</span>
+        {previewUrl && <img className="preview" src={previewUrl} alt="Previsualització" />}
       </button>
       <input
         ref={fileInput}
@@ -139,13 +140,11 @@ function App() {
         accept="image/*"
         onChange={(event) => setFile(event.target.files?.[0])}
       />
-      <p className="filename">{selectedFile?.name ?? "No image selected"}</p>
-
-      {message && <p className={`message${message === "Processing..." ? " processing" : ""}`} role="alert">{message}</p>}
+      {message && <p className={`message${message === "Processant..." ? " processing" : ""}`} role="alert">{message}</p>}
       {selectedFile && (
         <section className="result-card">
           <div className="result-header">
-            <span>Result</span>
+            <span>Resultat</span>
             <button
               className={`copy-button${copied ? " copied" : ""}`}
               type="button"
@@ -155,8 +154,8 @@ function App() {
                 window.setTimeout(() => setCopied(false), 1200);
               }}
               disabled={!markdown}
-              aria-label={copied ? "Markdown copied" : "Copy Markdown"}
-              title={copied ? "Copied" : "Copy Markdown"}
+              aria-label={copied ? "Markdown copiat" : "Copia el Markdown"}
+              title={copied ? "Copiat" : "Copia el Markdown"}
             >
               {copied ? (
                 <svg aria-hidden="true" viewBox="0 0 16 16">
@@ -179,7 +178,7 @@ function App() {
                 <svg aria-hidden="true" viewBox="0 0 24 24">
                   <circle cx="12" cy="12" r="9" />
                 </svg>
-                Processing
+                Processant
               </span>
             </div>
           )}
@@ -187,10 +186,30 @@ function App() {
             value={markdown}
             readOnly
             spellCheck={false}
-            placeholder="Your converted Markdown will appear here..."
+            placeholder="El Markdown convertit apareixerà aquí..."
           />
         </section>
       )}
+      <footer className="source-footer">
+        <h3>Codi font</h3>
+        <p>
+          GitHub:{" "}
+          <a href="https://github.com/Mapaor/pix2text-ocr-cat" target="_blank" rel="noreferrer">
+            pix2text-ocr-cat
+          </a>
+          &nbsp;(basat en <a href="https://github.com/breezedeus/Pix2Text" target="_blank" rel="noreferrer">
+            pix2tex
+          </a>)
+        </p>
+        <p className="source-note">
+          Nota: Per text normal utilitza{" "}
+          <a href="https://ocr.cat/" target="_blank" rel="noreferrer">
+            ocr.cat
+          </a>
+          .
+        </p>
+      </footer>
+      </div>
     </main>
   );
 }
