@@ -206,7 +206,6 @@ function App() {
           <a href="https://ocr.cat/" target="_blank" rel="noreferrer">
             ocr.cat
           </a>
-          .
         </p>
       </footer>
       </div>
