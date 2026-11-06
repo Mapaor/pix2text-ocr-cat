@@ -1,0 +1,20 @@
+__pycache__/
+*.py[cod]
+
+# Note: Runtime weights are stored outside this workspace in /opt/pix2text/models.
+
+# Source repos for code reference only
+/CnOCR/
+/CnSTD/
+/EasyOCR/
+/Pix2Text/
+
+# Model repositories (for reference only)
+/pix2text-layout/
+/pix2text-layout-docyolo/
+/pix2text-mfd/
+/pix2text-mfd-1.5/
+/pix2text-mfd-coreml/
+/pix2text-mfr/
+/pix2text-mfr-1.5/
+/pix2text-table-rec/

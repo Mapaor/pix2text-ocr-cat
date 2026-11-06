@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pix2Text</title>
+    <style>
+      :root { color-scheme: dark; font-family: system-ui, sans-serif; }
+      body { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+      textarea { width: 100%; min-height: 22rem; box-sizing: border-box; }
+      button, label { cursor: pointer; padding: .6rem .9rem; }
+      .drop { border: 2px dashed #888; padding: 2rem; text-align: center; margin: 1rem 0; }
+      .drop:focus, .drop:hover { border-color: #6cf; }
+      .actions { display: flex; gap: .6rem; flex-wrap: wrap; }
+      .error { color: #ff8a8a; min-height: 1.5rem; }
+      #file { display: none; }
+      .language { margin: 1rem 0; }
+      .recognition-type { margin: 1rem 0; }
+    </style>
+  </head>
+  <body>
+    <h1>Pix2Text</h1>
+    <p>Paste an image or choose one to convert it to Markdown.</p>
+    <div class="language">
+      <label for="language">Language:</label>
+      <select id="language">
+        <option value="en">English</option>
+        <option value="es">Spanish</option>
+      </select>
+    </div>
+    <div class="recognition-type">
+      <label for="recognition-type">Recognition type:</label>
+      <select id="recognition-type">
+        <option value="page">Page</option>
+        <option value="text_formula" selected>Text and formulas</option>
+        <option value="formula">Formula</option>
+        <option value="text">Text</option>
+      </select>
+    </div>
+    <div id="drop" class="drop" tabindex="0">Paste an image here, or <label for="file">choose a file</label></div>
+    <input id="file" type="file" accept="image/*">
+    <p id="filename"></p>
+    <div class="actions">
+      <button id="convert" type="button">Convert</button>
+      <button id="copy" type="button" disabled>Copy Markdown</button>
+      <button id="download" type="button" disabled>Download Markdown</button>
+    </div>
+    <p id="error" class="error" role="alert"></p>
+    <h2>Markdown</h2>
+    <textarea id="output" readonly spellcheck="false"></textarea>
+    <script>
+      const drop = document.querySelector("#drop");
+      const fileInput = document.querySelector("#file");
+      const convert = document.querySelector("#convert");
+      const copy = document.querySelector("#copy");
+      const download = document.querySelector("#download");
+      const output = document.querySelector("#output");
+      const error = document.querySelector("#error");
+      const filename = document.querySelector("#filename");
+      const language = document.querySelector("#language");
+      const recognitionType = document.querySelector("#recognition-type");
+      let selectedFile;
+
+      function setFile(file) {
+        if (!file || !file.type.startsWith("image/")) {
+          error.textContent = "Please select an image.";
+          return;
+        }
+        selectedFile = file;
+        filename.textContent = file.name || "Pasted image";
+        error.textContent = "";
+      }
+
+      document.addEventListener("paste", event => {
+        const items = [...(event.clipboardData?.items || [])];
+        const item = items.find(item => item.type.startsWith("image/"));
+        if (!item) return;
+        event.preventDefault();
+        setFile(item.getAsFile());
+      });
+      drop.addEventListener("dragover", event => event.preventDefault());
+      drop.addEventListener("drop", event => {
+        event.preventDefault();
+        setFile(event.dataTransfer.files[0]);
+      });
+      fileInput.addEventListener("change", () => setFile(fileInput.files[0]));
+
+      convert.addEventListener("click", async () => {
+        if (!selectedFile) {
+          error.textContent = "Paste or select an image first.";
+          return;
+        }
+        const data = new FormData();
+        data.append("image", selectedFile);
+        data.append("language", language.value);
+        data.append("recognition_type", recognitionType.value);
+        convert.disabled = true;
+        error.textContent = "Processing...";
+        try {
+          const response = await fetch("/api/convert", { method: "POST", body: data });
+          const body = await response.json();
+          if (!response.ok) throw new Error(body.detail || "Conversion failed.");
+          output.value = body.markdown;
+          copy.disabled = false;
+          download.disabled = false;
+          error.textContent = "";
+        } catch (reason) {
+          error.textContent = reason.message;
+        } finally {
+          convert.disabled = false;
+        }
+      });
+
+      copy.addEventListener("click", () => navigator.clipboard.writeText(output.value));
+      download.addEventListener("click", () => {
+        const blob = new Blob([output.value], { type: "text/markdown" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "pix2text.md";
+        link.click();
+        URL.revokeObjectURL(link.href);
+      });
+    </script>
+  </body>
+</html>
