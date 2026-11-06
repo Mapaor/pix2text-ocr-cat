@@ -8,6 +8,7 @@ from typing import Annotated, Literal
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from PIL import Image, UnidentifiedImageError
 
 os.environ.setdefault("PIX2TEXT_HOME", "/opt/pix2text/models")
@@ -33,6 +34,7 @@ P2T_CONFIG = {
 app = FastAPI(title="Pix2Text")
 logger = logging.getLogger(__name__)
 P2T_BY_LANGUAGE: dict[str, Pix2Text] = {}
+app.mount("/assets", StaticFiles(directory=STATIC_DIR / "assets"), name="assets")
 
 
 def get_pix2text(language: Literal["en", "es"]) -> Pix2Text:

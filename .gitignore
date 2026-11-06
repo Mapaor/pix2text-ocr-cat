@@ -1,5 +1,6 @@
 __pycache__/
 *.py[cod]
+app/frontend/node_modules/
 
 # Note: Runtime weights are stored outside this workspace in /opt/pix2text/models.
 
@@ -18,3 +19,6 @@ __pycache__/
 /pix2text-mfr/
 /pix2text-mfr-1.5/
 /pix2text-table-rec/
+
+# Other repos
+/ocr-en-catala/
