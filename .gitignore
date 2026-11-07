@@ -4,11 +4,10 @@ app/frontend/node_modules/
 
 # Runtime model weights are downloaded from Hugging Face and must not be committed.
 
-# Source repos for code reference only
+# Pix2Text source is part of the server and is imported locally.
 /CnOCR/
 /CnSTD/
 /EasyOCR/
-/Pix2Text/
 
 # Model directories (downloaded runtime assets)
 /pix2text-layout/

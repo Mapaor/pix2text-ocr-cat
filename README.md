@@ -1,5 +1,14 @@
 # Pix2Text Instance
-This is a python fastapi server that internally runs pix2text, allowing OCR of mathematical formulas with the open source models YOLO (layout detection), Table recognition, MFD (Math Formula Detection), MFR (Math Formula Recognition) and EasyOCR (for text recognition). The frontend is vite react compiled to static files that the python server serves.
+This is a Python FastAPI server that internally runs Pix2Text, allowing OCR
+of mathematical formulas with open-source layout, table, formula detection
+and recognition models. Text recognition uses PaddleOCR for English, Spanish,
+and Catalan.
+The frontend is Vite React compiled to static files that the Python server
+serves.
+
+The server imports the local [`Pix2Text`](./Pix2Text) source tree. Keep that
+directory in the repository; it contains the PaddleOCR integration used by the
+server.
 
 ## The models
 
@@ -28,6 +37,15 @@ The MFD-1.5 model is available from
 
 ```bash
 source /opt/pix2text/venv/bin/activate
+```
+
+### Installing the local Pix2Text package
+
+From `pix2text-server`, install the server dependencies and the local package:
+
+```bash
+pip install -r Pix2Text/requirements.txt
+pip install -e Pix2Text
 ```
 
 ### Updating

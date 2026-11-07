@@ -4,7 +4,7 @@
 
 - **Layout Analysis Model**: [breezedeus/pix2text-layout](https://huggingface.co/breezedeus/pix2text-layout) ([China Mirror](https://hf-mirror.com/breezedeus/pix2text-layout)).
 - **Table Recognition Model**: [breezedeus/pix2text-table-rec](https://huggingface.co/breezedeus/pix2text-table-rec) ([China Mirror](https://hf-mirror.com/breezedeus/pix2text-table-rec)).
-- **Text Recognition Engine**: Supports **`80+` languages**, such as **English, Simplified Chinese, Traditional Chinese, Vietnamese**, etc. Among them, **English** and **Simplified Chinese** recognition use the open-source OCR tool [CnOCR](https://github.com/breezedeus/cnocr), while other languages use the open-source OCR tool [EasyOCR](https://github.com/JaidedAI/EasyOCR).
+- **Text Recognition Engine**: this server uses [PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) for its configured English, Spanish, and Catalan text modes.
 - **Mathematical Formula Detection Model (MFD)**: [breezedeus/pix2text-mfd-1.5](https://huggingface.co/breezedeus/pix2text-mfd-1.5) ([China Mirror](https://hf-mirror.com/breezedeus/pix2text-mfd-1.5)). Implemented based on [CnSTD](https://github.com/breezedeus/cnstd).
 - **Mathematical Formula Recognition Model (MFR)**: [breezedeus/pix2text-mfr-1.5](https://huggingface.co/breezedeus/pix2text-mfr-1.5) ([China Mirror](https://hf-mirror.com/breezedeus/pix2text-mfr-1.5)).
 
@@ -49,7 +49,9 @@ Download all files here to the `~/.pix2text/1.1/mfr-1.5-onnx` directory (on Wind
 > Note: The `1.1` in the path above is the version number of pix2text; `1.1.*` all correspond to `1.1`. If it is a different version, please replace it accordingly.
 
 ## Text Recognition Engine
-Pix2Text's **Text Recognition Engine** can recognize **`80+` languages**, such as **English, Simplified Chinese, Traditional Chinese, Vietnamese**, etc. Among them, **English** and **Simplified Chinese** recognition use the open-source OCR tool [CnOCR](https://github.com/breezedeus/cnocr), while other languages use the open-source OCR tool [EasyOCR](https://github.com/JaidedAI/EasyOCR).
+Pix2Text's text recognition engine is configured in this server to use
+[PaddleOCR](https://github.com/PaddlePaddle/PaddleOCR) for English, Spanish,
+and Catalan (`en`, `es`, and `ca`).
 
 Under normal circumstances, CnOCR's models will be downloaded automatically. If automatic download is not possible, you can refer to the instructions below for manual download.
 CnOCR's open-source models are all placed in the [**cnstd-cnocr-models**](https://huggingface.co/breezedeus/cnstd-cnocr-models) project ([China Mirror](https://hf-mirror.com/breezedeus/cnstd-cnocr-models)) and can be downloaded and used for free.
@@ -66,7 +68,8 @@ CnOCR also provides **advanced paid models**. For details, refer to the instruct
 
 <br/>
 
-For EasyOCR model downloads, please refer to [EasyOCR](https://github.com/JaidedAI/EasyOCR).
+PaddleOCR downloads its recognition and detection models on first use. The
+models are cached by PaddleOCR in its normal model cache directory.
 
 ## Advanced Paid Models
 

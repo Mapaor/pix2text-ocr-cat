@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-type Language = "en" | "es";
+type Language = "en" | "es" | "ca";
 type RecognitionType = "page" | "text_formula" | "formula" | "text";
 
 const recognitionOptions: Array<{ value: RecognitionType; label: string }> = [
@@ -97,6 +97,7 @@ function App() {
         >
             <option value="en">Anglès</option>
             <option value="es">Castellà</option>
+            <option value="ca">Català</option>
         </select>
 
         <label className="field-label" htmlFor="recognition-type">Tipus de reconeixement</label>

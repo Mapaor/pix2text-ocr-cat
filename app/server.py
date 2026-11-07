@@ -12,7 +12,6 @@ from fastapi.staticfiles import StaticFiles
 from PIL import Image, UnidentifiedImageError
 
 os.environ.setdefault("PIX2TEXT_HOME", "/opt/pix2text/models")
-os.environ.setdefault("EASYOCR_MODULE_PATH", "/opt/pix2text/models/easyocr")
 
 from pix2text import Pix2Text
 
@@ -26,7 +25,7 @@ P2T_CONFIG = {
     "text_formula": {
         "mfd": {"model_name": "mfd-1.5", "model_backend": "onnx"},
         "formula": {"model_name": "mfr-1.5", "model_backend": "onnx"},
-        "text": {},
+        "text": {"engine": "paddleocr"},
     },
     "table": {},
 }
@@ -37,7 +36,7 @@ P2T_BY_LANGUAGE: dict[str, Pix2Text] = {}
 app.mount("/assets", StaticFiles(directory=STATIC_DIR / "assets"), name="assets")
 
 
-def get_pix2text(language: Literal["en", "es"]) -> Pix2Text:
+def get_pix2text(language: Literal["en", "es", "ca"]) -> Pix2Text:
     if language not in P2T_BY_LANGUAGE:
         config = {
             **P2T_CONFIG,
@@ -73,7 +72,7 @@ async def health() -> dict[str, str]:
 @app.post("/api/convert")
 async def convert(
     image: Annotated[UploadFile, File(description="Image to convert")],
-    language: Annotated[Literal["en", "es"], Form()] = "en",
+    language: Annotated[Literal["en", "es", "ca"], Form()] = "en",
     recognition_type: Annotated[
         Literal["page", "text_formula", "formula", "text"], Form()
     ] = "text_formula",
