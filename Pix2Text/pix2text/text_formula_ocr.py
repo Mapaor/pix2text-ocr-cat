@@ -243,7 +243,11 @@ class TextFormulaOCR(object):
         mf_results = []
         enable_formula = kwargs.get('contain_formula', True) and self.enable_formula
         if enable_formula and self.mfd is not None and self.latex_ocr is not None:
-            analyzer_outs = self.mfd(img0.copy(), resized_shape=resized_shape)
+            analyzer_outs = self.mfd(
+                img0.copy(),
+                resized_shape=resized_shape,
+                conf=kwargs.get('mfd_conf', 0.25),
+            )
             for mf_box_info in analyzer_outs:
                 box = mf_box_info['box']
                 xmin, ymin, xmax, ymax = (

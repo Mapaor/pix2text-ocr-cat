@@ -56,7 +56,8 @@ curl http://127.0.0.1:8000/health
 
 The response should report `"text_ocr": "paddleocr"` and
 `"languages": "en,es,ca"`. PaddleOCR 3 downloads the language model on first
-use.
+use. Mixed text/formula recognition uses a higher formula-detection confidence
+threshold to avoid interpreting ordinary Catalan letters as formulas.
 
 ### Updating
 
