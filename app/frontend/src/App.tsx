@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 type Language = "en" | "es" | "ca";
 type RecognitionType = "page" | "text_formula" | "formula" | "text";
+type ApiResponse = { markdown?: string; detail?: unknown };
 
 const recognitionOptions: Array<{ value: RecognitionType; label: string }> = [
   { value: "page", label: "Pàgina" },
@@ -9,6 +10,19 @@ const recognitionOptions: Array<{ value: RecognitionType; label: string }> = [
   { value: "formula", label: "Fórmula" },
   { value: "text", label: "Text" },
 ];
+
+function formatError(detail: unknown): string {
+  if (typeof detail === "string" && detail) return detail;
+  if (detail instanceof Error) return detail.message;
+  if (detail !== undefined) {
+    try {
+      return JSON.stringify(detail);
+    } catch {
+      return "La conversió ha fallat.";
+    }
+  }
+  return "La conversió ha fallat.";
+}
 
 function App() {
   const [selectedFile, setSelectedFile] = useState<File>();
@@ -70,8 +84,13 @@ function App() {
         method: "POST",
         body: data,
       });
-      const body = (await response.json()) as { markdown?: string; detail?: string };
-      if (!response.ok) throw new Error(body.detail || "La conversió ha fallat.");
+      let body: ApiResponse;
+      try {
+        body = (await response.json()) as ApiResponse;
+      } catch {
+        throw new Error(`La conversió ha fallat (${response.status}).`);
+      }
+      if (!response.ok) throw new Error(formatError(body.detail));
       setMarkdown(body.markdown ?? "");
       setMessage("");
     } catch (reason) {
