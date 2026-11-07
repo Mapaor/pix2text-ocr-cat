@@ -246,7 +246,9 @@ class TextFormulaOCR(object):
             analyzer_outs = self.mfd(
                 img0.copy(),
                 resized_shape=resized_shape,
+                box_margin=kwargs.get('mfd_box_margin', 0),
                 conf=kwargs.get('mfd_conf', 0.25),
+                dedup_thrsh=kwargs.get('mfd_dedup_thrsh', 0.1),
             )
             for mf_box_info in analyzer_outs:
                 box = mf_box_info['box']
