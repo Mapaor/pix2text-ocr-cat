@@ -2,7 +2,7 @@ __pycache__/
 *.py[cod]
 app/frontend/node_modules/
 
-# Note: Runtime weights are stored outside this workspace in /opt/pix2text/models.
+# Runtime model weights are downloaded from Hugging Face and must not be committed.
 
 # Source repos for code reference only
 /CnOCR/
@@ -10,7 +10,7 @@ app/frontend/node_modules/
 /EasyOCR/
 /Pix2Text/
 
-# Model repositories (for reference only)
+# Model directories (downloaded runtime assets)
 /pix2text-layout/
 /pix2text-layout-docyolo/
 /pix2text-mfd/
