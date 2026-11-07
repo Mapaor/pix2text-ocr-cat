@@ -357,6 +357,8 @@ class TextFormulaOCR(object):
             outs, img0.size[1], max_expand_ratio=max_height_expand_ratio
         )
 
+        text_boxes = []
+        text_patches = []
         for line_idx, line_boxes in enumerate(outs):
             for box in line_boxes:
                 if box['type'] != 'text':
@@ -369,9 +371,21 @@ class TextFormulaOCR(object):
                     int(bbox[2][1]),
                 )
                 crop_patch = np.array(masked_img.crop((xmin, ymin, xmax, ymax)))
-                part_res = self.text_ocr.recognize_only(crop_patch)
-                box['text'] = part_res['text']
-                box['score'] = part_res['score']
+                text_boxes.append(box)
+                text_patches.append(crop_patch)
+
+        recognize_batch = getattr(self.text_ocr, 'recognize_batch', None)
+        if callable(recognize_batch) and text_patches:
+            text_results = recognize_batch(text_patches)
+        else:
+            text_results = [
+                self.text_ocr.recognize_only(crop_patch)
+                for crop_patch in text_patches
+            ]
+        for box, part_res in zip(text_boxes, text_results):
+            box['text'] = part_res['text']
+            box['score'] = part_res['score']
+        for line_idx, line_boxes in enumerate(outs):
             outs[line_idx] = [box for box in line_boxes if box['text'].strip()]
 
         logger.debug(outs)

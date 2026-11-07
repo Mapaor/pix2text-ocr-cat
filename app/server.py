@@ -106,6 +106,7 @@ async def convert(
                 file_type=recognition_type,
                 resized_shape=768,
                 mfd_conf=0.8,
+                mfr_batch_size=5,
                 return_text=True,
             )
             if recognition_type == "page":

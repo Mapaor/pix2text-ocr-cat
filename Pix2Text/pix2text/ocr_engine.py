@@ -129,6 +129,22 @@ class PaddleOCREngine(TextOcrEngine):
     name = 'paddleocr'
 
     def detect_only(self, img: np.ndarray, **kwargs):
+        paddlex_pipeline = getattr(self.ocr_engine, 'paddlex_pipeline', None)
+        pipeline = getattr(paddlex_pipeline, '_pipeline', None)
+        detector = getattr(pipeline, 'text_det_model', None)
+        if detector is not None:
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+            result = next(iter(detector.predict([img], batch_size=1)), None)
+            if result is not None:
+                polygons = self._result_value(result, 'dt_polys')
+                if polygons is not None:
+                    return {
+                        'detected_texts': [
+                            {'position': np.asarray(polygon)}
+                            for polygon in polygons
+                        ]
+                    }
+
         return {
             'detected_texts': [
                 {'position': box}
@@ -158,6 +174,23 @@ class PaddleOCREngine(TextOcrEngine):
             _, text, score = results[0]
             out = {'text': text, 'score': score}
         return out
+
+    def recognize_batch(self, imgs: Sequence[np.ndarray], **kwargs) -> List[dict]:
+        paddlex_pipeline = getattr(self.ocr_engine, 'paddlex_pipeline', None)
+        pipeline = getattr(paddlex_pipeline, '_pipeline', None)
+        recognizer = getattr(pipeline, 'text_rec_model', None)
+        if recognizer is None:
+            return [self.recognize_only(img, **kwargs) for img in imgs]
+
+        images = [cv2.cvtColor(img, cv2.COLOR_RGB2BGR) for img in imgs]
+        results = recognizer.predict(images, batch_size=min(2, len(images)))
+        return [
+            {
+                'text': self._result_value(result, 'rec_text') or '',
+                'score': float(self._result_value(result, 'rec_score') or 0.0),
+            }
+            for result in results
+        ]
 
     def ocr(
         self, img: np.ndarray, rec_config: Optional[dict] = None, **kwargs
