@@ -57,8 +57,10 @@ curl http://127.0.0.1:8000/health
 The response should report `"text_ocr": "paddleocr"` and
 `"languages": "en,es,ca"`. PaddleOCR 3 downloads the language model on first
 use. Mixed text/formula recognition uses a higher formula-detection confidence
-threshold (`0.6`) to preserve inline variables such as `A`, `Z`, and
+threshold (`0.55`) to preserve inline variables such as `A`, `Z`, and
 `a_V` while avoiding the lowest-confidence false positives.
+Formula detection uses a larger input resolution than text OCR so adjacent
+inline variables are separated without increasing every OCR crop's size.
 The first request after a service restart still initializes the CPU models;
 subsequent requests reuse the warm instances.
 The server calls PaddleX's detector and recognizer components directly for
