@@ -66,7 +66,7 @@ async def index_head() -> None:
 
 @app.get("/health")
 async def health() -> dict[str, str]:
-    return {"status": "ok"}
+    return {"status": "ok", "text_ocr": "paddleocr", "languages": "en,es,ca"}
 
 
 @app.post("/api/convert")

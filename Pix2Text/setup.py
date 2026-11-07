@@ -38,7 +38,7 @@ required = [
     "doclayout-yolo<0.1",
 ]
 extras_require = {
-    "multilingual": ["paddleocr>=2.7,<3", "paddlepaddle>=2.6.2,<3"],
+    "multilingual": ["paddleocr>=3.7,<4", "paddlepaddle>=3,<4"],
     "dev": ["pip-tools", "pytest"],
     "serve": ["uvicorn[standard]", "fastapi", "python-multipart", "pydantic"],
     "vlm": ["litellm"],

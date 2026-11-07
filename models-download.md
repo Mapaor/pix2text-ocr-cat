@@ -68,7 +68,7 @@ CnOCR also provides **advanced paid models**. For details, refer to the instruct
 
 <br/>
 
-PaddleOCR downloads its recognition and detection models on first use. The
+PaddleOCR 3 downloads its recognition and detection models on first use. The
 models are cached by PaddleOCR in its normal model cache directory.
 
 ## Advanced Paid Models

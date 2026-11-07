@@ -1,12 +1,15 @@
 # coding: utf-8
 # [Pix2Text](https://github.com/breezedeus/pix2text): an Open-Source Alternative to Mathpix.
 # Copyright (C) 2022-2024, [Breezedeus](https://www.breezedeus.com).
+import logging
 from typing import Sequence, List, Optional
 
 import numpy as np
 import cv2
 
 from .utils import custom_deepcopy
+
+logger = logging.getLogger(__name__)
 
 
 class TextOcrEngine:
@@ -154,13 +157,30 @@ class PaddleOCREngine(TextOcrEngine):
     def _readtext(self, img: np.ndarray, **kwargs) -> List[tuple]:
         kwargs.pop('resized_shape', None)
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        results = self.ocr_engine.ocr(img, cls=True, **kwargs)
-        if not results or not results[0]:
-            return []
-        return [
-            (np.asarray(result[0]), result[1][0], float(result[1][1]))
-            for result in results[0]
-        ]
+        results = self.ocr_engine.predict(img, **kwargs)
+        outputs = []
+        for result in results:
+            polygons = self._result_value(result, 'rec_polys', 'dt_polys')
+            texts = self._result_value(result, 'rec_texts')
+            scores = self._result_value(result, 'rec_scores')
+            if polygons is None or texts is None or scores is None:
+                continue
+            outputs.extend(
+                (np.asarray(polygon), text, float(score))
+                for polygon, text, score in zip(polygons, texts, scores)
+            )
+        return outputs
+
+    @staticmethod
+    def _result_value(result, *names):
+        for name in names:
+            try:
+                value = result[name]
+            except (KeyError, TypeError):
+                value = getattr(result, name, None)
+            if value is not None:
+                return value
+        return None
 
 
 def prepare_ocr_engine(languages: Sequence[str], ocr_engine_config):
@@ -182,9 +202,9 @@ def prepare_ocr_engine(languages: Sequence[str], ocr_engine_config):
         except ImportError as exc:
             raise ImportError('Please install paddleocr and paddlepaddle first') from exc
         ocr_engine_config.pop('context', None)
-        ocr_engine_config.setdefault('use_angle_cls', True)
-        ocr_engine = PaddleOCR(lang=languages[0], use_gpu=False, **ocr_engine_config)
+        ocr_engine = PaddleOCR(lang=languages[0], device='cpu', **ocr_engine_config)
         engine_wrapper = PaddleOCREngine(languages, ocr_engine)
+        logger.info('Using PaddleOCR for languages: %s', ', '.join(languages))
     else:
         raise ValueError(f'Unsupported text OCR engine: {engine_name}')
     return engine_wrapper
