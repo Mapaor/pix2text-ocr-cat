@@ -2,6 +2,7 @@ import asyncio
 import io
 import logging
 import os
+import sys
 import tempfile
 from pathlib import Path
 from typing import Annotated, Literal
@@ -12,6 +13,11 @@ from fastapi.staticfiles import StaticFiles
 from PIL import Image, UnidentifiedImageError
 
 os.environ.setdefault("PIX2TEXT_HOME", "/opt/pix2text/models")
+
+# Prefer the versioned Pix2Text source shipped with this server over any
+# separately installed package in the virtual environment.
+LOCAL_PIX2TEXT = Path(__file__).resolve().parents[1] / "Pix2Text"
+sys.path.insert(0, str(LOCAL_PIX2TEXT))
 
 from pix2text import Pix2Text
 
