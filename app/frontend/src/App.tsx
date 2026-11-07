@@ -12,7 +12,7 @@ const recognitionOptions: Array<{ value: RecognitionType; label: string }> = [
 
 function App() {
   const [selectedFile, setSelectedFile] = useState<File>();
-  const [language, setLanguage] = useState<Language>("es");
+  const [language, setLanguage] = useState<Language>("ca");
   const [recognitionType, setRecognitionType] =
     useState<RecognitionType>("text_formula");
   const [markdown, setMarkdown] = useState("");
@@ -63,7 +63,7 @@ function App() {
     data.append("language", language);
     data.append("recognition_type", recognitionType);
     setIsConverting(true);
-    setMessage("Processant...");
+    setMessage("");
 
     try {
       const response = await fetch("/api/convert", {
@@ -141,7 +141,7 @@ function App() {
         accept="image/*"
         onChange={(event) => setFile(event.target.files?.[0])}
       />
-      {message && <p className={`message${message === "Processant..." ? " processing" : ""}`} role="alert">{message}</p>}
+      {message && <p className="message" role="alert">{message}</p>}
       {selectedFile && (
         <section className="result-card">
           <div className="result-header">
