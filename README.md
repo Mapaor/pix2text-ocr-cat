@@ -57,7 +57,19 @@ curl http://127.0.0.1:8000/health
 The response should report `"text_ocr": "paddleocr"` and
 `"languages": "en,es,ca"`. PaddleOCR 3 downloads the language model on first
 use. Mixed text/formula recognition uses a higher formula-detection confidence
-threshold to avoid interpreting ordinary Catalan letters as formulas.
+threshold (`0.6`) to avoid interpreting ordinary Catalan letters as formulas.
+The first request after a service restart still initializes the CPU models;
+subsequent requests reuse the warm instances.
+
+PaddleOCR/PaddleX models are cached persistently in
+`/home/marti/.paddlex`; they are not downloaded for every request. The service
+keeps one Pix2Text/PaddleOCR instance in memory per selected language. Add
+this environment variable to the systemd service to make the cache location
+explicit:
+
+```ini
+Environment=PADDLE_PDX_CACHE_HOME=/home/marti/.paddlex
+```
 
 ### Updating
 

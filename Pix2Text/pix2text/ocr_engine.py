@@ -137,6 +137,21 @@ class PaddleOCREngine(TextOcrEngine):
         }
 
     def recognize_only(self, img: np.ndarray, **kwargs) -> dict:
+        # TextFormulaOCR already detected the text boxes. Calling the public
+        # OCR pipeline here would run text detection again for every crop.
+        paddlex_pipeline = getattr(self.ocr_engine, 'paddlex_pipeline', None)
+        pipeline = getattr(paddlex_pipeline, '_pipeline', None)
+        recognizer = getattr(pipeline, 'text_rec_model', None)
+        if recognizer is not None:
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+            results = recognizer.predict([img], batch_size=1)
+            result = next(iter(results), None)
+            if result is not None:
+                text = self._result_value(result, 'rec_text')
+                score = self._result_value(result, 'rec_score')
+                if text is not None and score is not None:
+                    return {'text': text, 'score': float(score)}
+
         out = {'text': '', 'score': 0.0}
         results = self._readtext(img, **kwargs)
         if results:
@@ -202,6 +217,9 @@ def prepare_ocr_engine(languages: Sequence[str], ocr_engine_config):
         except ImportError as exc:
             raise ImportError('Please install paddleocr and paddlepaddle first') from exc
         ocr_engine_config.pop('context', None)
+        ocr_engine_config.setdefault('use_doc_orientation_classify', False)
+        ocr_engine_config.setdefault('use_doc_unwarping', False)
+        ocr_engine_config.setdefault('use_textline_orientation', False)
         ocr_engine = PaddleOCR(lang=languages[0], device='cpu', **ocr_engine_config)
         engine_wrapper = PaddleOCREngine(languages, ocr_engine)
         logger.info('Using PaddleOCR for languages: %s', ', '.join(languages))

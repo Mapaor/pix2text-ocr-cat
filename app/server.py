@@ -13,6 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from PIL import Image, UnidentifiedImageError
 
 os.environ.setdefault("PIX2TEXT_HOME", "/opt/pix2text/models")
+os.environ.setdefault("PADDLE_PDX_CACHE_HOME", str(Path.home() / ".paddlex"))
 
 # Prefer the versioned Pix2Text source shipped with this server over any
 # separately installed package in the virtual environment.
@@ -104,7 +105,7 @@ async def convert(
                 converted,
                 file_type=recognition_type,
                 resized_shape=768,
-                mfd_conf=0.5,
+                mfd_conf=0.6,
                 return_text=True,
             )
             if recognition_type == "page":
