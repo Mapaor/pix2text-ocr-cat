@@ -1,14 +1,11 @@
 # Pix2Text Instance
-This is a Python FastAPI server that internally runs Pix2Text, allowing OCR
-of mathematical formulas with open-source layout, table, formula detection
-and recognition models. Text recognition uses PaddleOCR 3 for English, Spanish,
-and Catalan.
-The frontend is Vite React compiled to static files that the Python server
+This is a Python FastAPI server that internally runs Pix2Text. The end goal is to allow OCR of text containing mathematical formulas even when the text is in Catalan (which Pix2Text does not support).
+
+It also has a layout model, table recognition besidese the MFD (Math Formula Detection), MFR (Math Formula Recognition) and PaddleOCR v3 (for text recognition of English, Spanish and Catalan). The frontend is Vite React compiled to static files that the Python server
 serves.
 
-The server imports the local [`Pix2Text`](./Pix2Text) source tree. Keep that
-directory in the repository; it contains the PaddleOCR integration used by the
-server.
+The server imports the local [`Pix2Text`](./Pix2Text) (forked repo added as a subdirectory). Keep that
+directory in the repository (.git folder was removed to avoid being detected as a git submodule). It contains the main modification which is replacing EasyOCR with PaddleOCR for text.
 
 ## The models
 
@@ -89,9 +86,6 @@ And then update the server:
 ```bash
 sudo systemctl restart pix2text.service
 ```
-
-## Roadmap
-
 
 ## License
 [MIT](/LICENSE)
