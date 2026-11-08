@@ -16,9 +16,8 @@ The key models are MFR-1.5 and MFD-1.5 which are open source and the core contri
 
 They are not state of the art OCR, the good ones need to be payed. But for simple formulas they work decently well.
 
-Model weights are runtime assets and are ignored by Git. Pix2Text normally
-downloads models automatically from Hugging Face. To download the MFR-1.5
-ONNX model manually:
+Git does not track model files. Pix2Text downloads models from Hugging Face
+when needed. To download the MFR-1.5 ONNX model yourself, run:
 
 ```bash
 source /opt/pix2text/venv/bin/activate
@@ -26,10 +25,9 @@ hf download breezedeus/pix2text-mfr-1.5 \
   --local-dir /opt/pix2text/models/1.1/mfr-1.5-onnx
 ```
 
-The MFR-1.5 repository contains `encoder_model.onnx`, `decoder_model.onnx`,
-and the tokenizer and processor configuration files required for inference.
-The MFD-1.5 model is available from
-[breezedeus/pix2text-mfd-1.5](https://huggingface.co/breezedeus/pix2text-mfd-1.5).
+The MFR-1.5 repository includes `encoder_model.onnx`, `decoder_model.onnx`,
+and the tokenizer and processor files. The MFD-1.5 model is on
+[Hugging Face](https://huggingface.co/breezedeus/pix2text-mfd-1.5).
 
 ## Development
 
@@ -54,28 +52,22 @@ After restarting the service, verify the configured OCR backend:
 curl http://127.0.0.1:8000/health
 ```
 
-The response should report `"text_ocr": "paddleocr"` and
-`"languages": "en,es,ca"`. PaddleOCR 3 downloads the language model on first
-use. Mixed text/formula recognition uses a higher formula-detection confidence
-threshold (`0.55`) to preserve inline variables such as `A`, `Z`, and
-`a_V` while avoiding the lowest-confidence false positives.
-Formula detection uses a larger input resolution than text OCR so adjacent
-inline variables are separated without increasing every OCR crop's size.
-The first request after a service restart still initializes the CPU models;
-subsequent requests reuse the warm instances.
-The server calls PaddleX's detector and recognizer components directly for
-mixed text/formula recognition, avoiding a full OCR pipeline pass for every
-text crop. Formula crops are processed in a batch.
+Check that the response includes `"text_ocr": "paddleocr"` and
+`"languages": "en,es,ca"`. PaddleOCR 3 downloads its language model the first
+time it runs.
 
-PaddleOCR/PaddleX models are cached persistently in
-`/home/marti/.paddlex`; they are not downloaded for every request. The service
-keeps one Pix2Text/PaddleOCR instance in memory per selected language. Add
-this environment variable to the systemd service to make the cache location
-explicit:
+For mixed text and formula recognition, formula detection uses a confidence
+threshold of `0.55`. This keeps inline equations without detecting many false positives. The text recognition is PaddleX directly (not the whole Paddle pipeline).
+
+The first request is always slower because it loads the CPU models. Later requests
+reuse them, and as models are cached (in my case in `/home/marti/.paddlex`) they persist even after page refreshes. To set the cache location in
+the systemd service, add:
 
 ```ini
 Environment=PADDLE_PDX_CACHE_HOME=/home/marti/.paddlex
 ```
+
+The typical time for a paragraph with formulas is 15-20s, which is not optimal but hey, it's free and open source running on a i5 CPU and no GPU.
 
 ### Updating
 
