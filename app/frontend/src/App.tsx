@@ -225,7 +225,7 @@ function App() {
           Nota: Per text normal utilitza{" "}
           <a href="https://ocr.cat/" target="_blank" rel="noreferrer">
             ocr.cat
-          </a>
+          </a>{", "}per fórmules soles utilitza <a href="https://math.ocr.cat/" target="_blank" rel="noreferrer">math.ocr.cat</a>
         </p>
       </footer>
       </div>
