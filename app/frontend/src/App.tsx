@@ -101,7 +101,26 @@ function App() {
   };
 
   const copyMarkdown = async () => {
-    await navigator.clipboard.writeText(markdown);
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(markdown);
+        return;
+      } catch {
+        // Fall through to the legacy copy method when clipboard access is denied.
+      }
+    }
+
+    const textarea = document.createElement("textarea");
+    textarea.value = markdown;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+    const copied = document.execCommand("copy");
+    textarea.remove();
+
+    if (!copied) throw new Error("No s'ha pogut copiar el Markdown.");
   };
 
   return (
@@ -169,9 +188,13 @@ function App() {
               className={`copy-button${copied ? " copied" : ""}`}
               type="button"
               onClick={async () => {
-                await copyMarkdown();
-                setCopied(true);
-                window.setTimeout(() => setCopied(false), 1200);
+                try {
+                  await copyMarkdown();
+                  setCopied(true);
+                  window.setTimeout(() => setCopied(false), 1200);
+                } catch (reason) {
+                  setMessage(reason instanceof Error ? reason.message : "No s'ha pogut copiar el Markdown.");
+                }
               }}
               disabled={!markdown}
               aria-label={copied ? "Markdown copiat" : "Copia el Markdown"}
