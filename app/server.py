@@ -66,6 +66,13 @@ async def index() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
 
 
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon() -> FileResponse:
+    # Keep the conventional root favicon URL available in production, where
+    # the frontend is served by FastAPI rather than Vite's dev server.
+    return FileResponse(Path(__file__).parent / "frontend" / "favicon.ico", media_type="image/x-icon")
+
+
 @app.head("/")
 async def index_head() -> None:
     return None
